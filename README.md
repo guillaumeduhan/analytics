@@ -48,7 +48,7 @@ cp .env.EXAMPLE .env   # configure your database credentials
 npm run start:dev
 ```
 
-The API will be available at `http://localhost:3000` and Swagger docs at `http://localhost:3000/docs`.
+The API will be available at `http://localhost:4200`, Swagger docs at `http://localhost:4200/docs`, and health check at `http://localhost:4200/health`.
 
 ### Production (PM2)
 

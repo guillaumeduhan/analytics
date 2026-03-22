@@ -5,6 +5,7 @@ import { Site, Session, Pageview, Event } from './entities';
 import { CollectModule } from './collect/collect.module';
 import { StatsModule } from './stats/stats.module';
 import { SitesModule } from './sites/sites.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SitesModule } from './sites/sites.module';
     CollectModule,
     StatsModule,
     SitesModule,
+    HealthModule,
   ],
 })
 export class AppModule {}

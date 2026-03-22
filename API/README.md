@@ -9,6 +9,7 @@ Analytics-G API is the server-side engine of the Analytics-G ecosystem. It colle
 - **Collect** — ingest pageviews, custom events, and time-on-page duration
 - **Sites** — register and manage tracked domains
 - **Stats** — summary, timeseries, top pages, referrers, countries, device/browser/OS breakdown, UTM campaigns, custom events, and realtime visitors
+- **Health** — `GET /health` endpoint for uptime monitoring
 - **Swagger** — auto-generated API docs available at `/docs`
 
 ## Get Started
@@ -46,7 +47,7 @@ cp .env.EXAMPLE .env
 | `DATABASE_USER` | PostgreSQL user |
 | `DATABASE_PASSWORD` | PostgreSQL password |
 | `DATABASE_NAME` | PostgreSQL database name |
-| `PORT` | API port (default `3000`) |
+| `PORT` | API port (default `4200`) |
 
 ### Running
 
@@ -91,6 +92,9 @@ API/
 │   │   ├── sites.service.ts
 │   │   ├── sites.module.ts
 │   │   └── sites.dto.ts
+│   ├── health/                  # Health check endpoint
+│   │   ├── health.controller.ts    # GET /health
+│   │   └── health.module.ts
 │   └── entities/                # TypeORM entities
 │       ├── site.entity.ts
 │       ├── session.entity.ts
