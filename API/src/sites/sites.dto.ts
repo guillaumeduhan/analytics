@@ -6,3 +6,9 @@ export class CreateSiteDto {
   @ApiProperty() @IsString() name: string;
   @ApiProperty({ required: false }) @IsOptional() @IsBoolean() public?: boolean;
 }
+
+export class UpdateSiteDto {
+  @ApiProperty({ required: false }) @IsOptional() @IsString() domain?: string;
+  @ApiProperty({ required: false }) @IsOptional() @IsString() name?: string;
+  @ApiProperty({ required: false }) @IsOptional() @IsBoolean() public?: boolean;
+}

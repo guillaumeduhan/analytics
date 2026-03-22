@@ -6,6 +6,9 @@ import { CollectModule } from './collect/collect.module';
 import { StatsModule } from './stats/stats.module';
 import { SitesModule } from './sites/sites.module';
 import { HealthModule } from './health/health.module';
+import { SessionsModule } from './sessions/sessions.module';
+import { PageviewsModule } from './pageviews/pageviews.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { HealthModule } from './health/health.module';
     CollectModule,
     StatsModule,
     SitesModule,
+    SessionsModule,
+    PageviewsModule,
+    EventsModule,
     HealthModule,
   ],
 })

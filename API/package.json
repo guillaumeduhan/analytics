@@ -2,8 +2,8 @@
   "name": "analytics-g",
   "version": "0.0.1",
   "description": "",
-  "author": "",
-  "private": true,
+  "author": "guillaumeduhan",
+  "private": false,
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
