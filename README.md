@@ -20,7 +20,7 @@ Analytics-G is a lightweight analytics solution designed to run on minimal hardw
 ```
 analytics-g/
 ├── API/          # NestJS backend — data collection & stats endpoints
-└── ...           # Frontend (coming soon)
+└── frontend/     # Next.js dashboard — analytics UI
 ```
 
 ## Get Started
@@ -29,9 +29,9 @@ analytics-g/
 
 - **Node.js** >= 18
 - **PostgreSQL** 17
-- **npm**
+- **pnpm** (frontend) / **npm** (API)
 
-### Quick Start
+### API
 
 ```bash
 # Clone the repository
@@ -50,18 +50,35 @@ npm run start:dev
 
 The API will be available at `http://localhost:4200`, Swagger docs at `http://localhost:4200/docs`, and health check at `http://localhost:4200/health`.
 
-### Production (PM2)
+### Frontend
 
 ```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+The dashboard will be available at `http://localhost:3000`.
+
+### Production
+
+```bash
+# API (PM2)
 cd API
 npm run build
 pm2 start ecosystem.config.js
+
+# Frontend
+cd frontend
+pnpm build
+pnpm start
 ```
 
 ## Tech Stack
 
 | Component | Technology |
 |---|---|
+| Frontend | Next.js 16, React 19, Tailwind CSS 4, Recharts, shadcn/ui |
 | API | NestJS 11, TypeScript 5 |
 | Database | PostgreSQL 17, TypeORM |
 | Hosting | Raspberry Pi 4 |

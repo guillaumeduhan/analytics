@@ -1,35 +1,102 @@
-# v0-analytics
+# Analytics-G Frontend
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+Dashboard UI for Analytics-G — a self-hosted, privacy-friendly web analytics platform.
 
-## Built with v0
+## About
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+Analytics-G Frontend is the client-side dashboard of the Analytics-G ecosystem. It visualizes pageviews, events, sessions, and visitor data collected by the API. Built with Next.js 16 and React 19.
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_8S4Iu7niYxw7IKgZFl3gHVxL2ijV)
+- **Sites overview** — list and manage all tracked domains
+- **Site detail** — per-domain analytics with stats, charts, and data tables
+- **Visitors chart** — timeseries visualization of traffic over time
+- **World map** — geographic breakdown of visitors
+- **Data tables** — top pages, referrers, devices, browsers, OS, and UTM campaigns
+- **Goals** — conversion tracking table
+- **Time range selector** — filter stats by period
+- **Dark mode** — theme toggle with system preference support
+- **Profile page** — user settings
 
-## Getting Started
+## Get Started
 
-First, run the development server:
+### Prerequisites
+
+- **Node.js** >= 18
+- **pnpm**
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+# From the repository root
+cd frontend
+
+# Install dependencies
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Running
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Development (watch mode)
+pnpm dev
 
-## Learn More
+# Production build
+pnpm build
+pnpm start
 
-To learn more, take a look at the following resources:
+# Lint
+pnpm lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+The dashboard will be available at `http://localhost:3000`.
 
-<a href="https://v0.app/chat/api/kiro/clone/guillaumeduhan/v0-analytics" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+## Architecture
+
+```
+frontend/
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx                # Root layout with theme provider
+│   │   ├── page.tsx                  # Home — sites overview
+│   │   ├── globals.css               # Global styles (Tailwind)
+│   │   ├── profile/
+│   │   │   └── page.tsx              # User profile page
+│   │   └── site/
+│   │       └── [domain]/
+│   │           └── page.tsx          # Per-site analytics dashboard
+│   ├── components/
+│   │   ├── analytics/                # Analytics-specific components
+│   │   │   ├── add-site-dialog.tsx      # Add new site dialog
+│   │   │   ├── data-table.tsx           # Generic data table
+│   │   │   ├── goals-table.tsx          # Goals / conversions table
+│   │   │   ├── header.tsx               # Dashboard header
+│   │   │   ├── site-card.tsx            # Site overview card
+│   │   │   ├── source-icon.tsx          # Traffic source icons
+│   │   │   ├── stats-card.tsx           # Summary stat card
+│   │   │   ├── theme-toggle.tsx         # Dark/light mode toggle
+│   │   │   ├── time-range-selector.tsx  # Period filter
+│   │   │   ├── visitors-chart.tsx       # Timeseries chart (Recharts)
+│   │   │   └── world-map.tsx            # Geographic visitor map
+│   │   ├── theme-provider.tsx        # next-themes provider
+│   │   └── ui/                       # shadcn/ui component library
+│   ├── hooks/                        # Custom React hooks
+│   └── lib/                          # Utilities, types, mock data
+├── public/                           # Static assets (icons, placeholders)
+├── next.config.mjs
+├── postcss.config.mjs
+├── tsconfig.json
+└── package.json
+```
+
+### Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 |
+| Language | TypeScript 5 |
+| UI | React 19 |
+| Styling | Tailwind CSS 4 |
+| Components | shadcn/ui (Radix UI) |
+| Charts | Recharts |
+| Forms | React Hook Form + Zod |
+| Theme | next-themes |
+| Linting | ESLint |
