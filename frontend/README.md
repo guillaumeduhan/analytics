@@ -21,7 +21,7 @@ Analytics-G Frontend is the client-side dashboard of the Analytics-G ecosystem. 
 ### Prerequisites
 
 - **Node.js** >= 18
-- **pnpm**
+- **yarn**
 
 ### Installation
 
@@ -30,21 +30,24 @@ Analytics-G Frontend is the client-side dashboard of the Analytics-G ecosystem. 
 cd frontend
 
 # Install dependencies
-pnpm install
+yarn install
 ```
 
 ### Running
 
 ```bash
 # Development (watch mode)
-pnpm dev
+yarn dev
+
+# Or use the Makefile
+make dev
 
 # Production build
-pnpm build
-pnpm start
+yarn build
+yarn start
 
 # Lint
-pnpm lint
+yarn lint
 ```
 
 The dashboard will be available at `http://localhost:3000`.
@@ -97,6 +100,7 @@ frontend/
 | Styling | Tailwind CSS 4 |
 | Components | shadcn/ui (Radix UI) |
 | Charts | Recharts |
+| Number Formatting | numeral |
 | Forms | React Hook Form + Zod |
 | Theme | next-themes |
 | Linting | ESLint |

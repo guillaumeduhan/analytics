@@ -32,6 +32,7 @@ import {
   getEvents,
   getRealtime,
 } from '@/lib/api'
+import { formatNumber } from '@/lib/format'
 import type {
   TimeRange,
   SiteStats,
@@ -166,21 +167,21 @@ export default function SiteDashboard({ params }: PageProps) {
             <div className="flex items-center gap-1 overflow-x-auto">
               <StatsCard
                 label="Unique Visitors"
-                value={stats.uniqueVisitors}
+                value={formatNumber(stats.uniqueVisitors)}
                 trend={stats.uniqueVisitorsTrend}
                 active={activeMetric === 'uniqueVisitors'}
                 onClick={() => setActiveMetric('uniqueVisitors')}
               />
               <StatsCard
                 label="Total Visits"
-                value={stats.totalVisits}
+                value={formatNumber(stats.totalVisits)}
                 trend={stats.totalVisitsTrend}
                 active={activeMetric === 'totalVisits'}
                 onClick={() => setActiveMetric('totalVisits')}
               />
               <StatsCard
                 label="Total Pageviews"
-                value={stats.totalPageviews}
+                value={formatNumber(stats.totalPageviews)}
                 trend={stats.totalPageviewsTrend}
                 active={activeMetric === 'totalPageviews'}
                 onClick={() => setActiveMetric('totalPageviews')}
@@ -236,7 +237,7 @@ export default function SiteDashboard({ params }: PageProps) {
                     header: 'Source',
                     render: (value, item) => (
                       <div className="flex items-center gap-2">
-                        <SourceIcon type={item.icon as string} className="w-4 h-4 text-muted-foreground" />
+                        <SourceIcon type={item.source as string} className="w-4 h-4 text-muted-foreground" />
                         <span>{value as string}</span>
                       </div>
                     ),

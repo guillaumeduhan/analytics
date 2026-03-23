@@ -23,25 +23,27 @@ analytics-g/
 └── frontend/     # Next.js dashboard — analytics UI
 ```
 
-## Get Started
+## Quick Start
+
+```bash
+git clone https://github.com/guillaumeduhan/analytics.git
+cd analytics
+./install.sh
+```
+
+This installs all dependencies (API + Frontend), sets up `.env` files, and runs the database schema.
 
 ### Prerequisites
 
 - **Node.js** >= 18
 - **PostgreSQL** 17
-- **pnpm** (frontend) / **npm** (API)
+- **yarn** (frontend) / **npm** (API)
 
-### API
+### Manual Setup
+
+#### API
 
 ```bash
-# Clone the repository
-git clone <repo-url>
-cd analytics-g
-
-# Set up the database
-psql -U <user> -d analytics_db -f API/database.sql
-
-# Install & run the API
 cd API
 npm install
 cp .env.EXAMPLE .env   # configure your database credentials
@@ -50,12 +52,12 @@ npm run start:dev
 
 The API will be available at `http://localhost:4200`, Swagger docs at `http://localhost:4200/docs`, and health check at `http://localhost:4200/health`.
 
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
-pnpm install
-pnpm dev
+yarn install
+yarn dev
 ```
 
 The dashboard will be available at `http://localhost:3000`.
@@ -70,8 +72,8 @@ pm2 start ecosystem.config.js
 
 # Frontend
 cd frontend
-pnpm build
-pnpm start
+yarn build
+yarn start
 ```
 
 ## Tech Stack

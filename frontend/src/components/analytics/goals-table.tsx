@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Expand } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { GoalData } from '@/lib/types'
+import { formatNumber } from '@/lib/format'
 
 interface GoalsTableProps {
   data: GoalData[]
@@ -44,10 +45,10 @@ export function GoalsTable({ data }: GoalsTableProps) {
             >
               <span className="flex-1 text-sm text-foreground">{goal.name}</span>
               <span className="w-16 text-right text-sm text-muted-foreground">
-                {goal.uniques}
+                {formatNumber(goal.uniques)}
               </span>
               <span className="w-16 text-right text-sm text-muted-foreground">
-                {goal.total}
+                {formatNumber(goal.total)}
               </span>
               <span className="w-16 text-right text-sm text-muted-foreground">
                 {goal.cr}%

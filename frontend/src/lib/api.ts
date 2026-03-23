@@ -132,7 +132,7 @@ export async function getSources(siteId: string, timeRange: TimeRange): Promise<
     `/stats/${siteId}/referrers?period=${period}`
   )
   return rows.map((r) => ({
-    source: r.referrer || 'Direct / None',
+    source: (r.referrer || 'Direct / None').replace(/^https?:\/\//, ''),
     visitors: Number(r.sessions),
   }))
 }

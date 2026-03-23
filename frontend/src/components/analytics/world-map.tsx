@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Expand } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { CountryData } from '@/lib/types'
+import { formatNumber } from '@/lib/format'
 
 interface WorldMapProps {
   data: CountryData[]
@@ -50,7 +51,7 @@ export function WorldMap({ data }: WorldMapProps) {
                 className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-secondary/50"
               >
                 <span className="text-sm text-foreground">{country.country}</span>
-                <span className="text-sm text-muted-foreground">{country.visitors}</span>
+                <span className="text-sm text-muted-foreground">{formatNumber(country.visitors)}</span>
               </div>
             ))}
           </div>

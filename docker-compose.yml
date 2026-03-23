@@ -30,7 +30,7 @@ services:
     ports:
       - "3002:3000"
     environment:
-      PGRST_DB_URI: "postgres://guillaume:password@host.docker.internal:5432/analytics_db"
+      PGRST_DB_URI: "postgres://guillaume:password@host.docker.internal:5432/postgres"
       PGRST_DB_SCHEMAS: "public"
       PGRST_DB_ANON_ROLE: "guillaume"
       PGRST_JWT_SECRET: "super-secret-jwt-token-with-at-least-32-characters-long"
@@ -44,13 +44,13 @@ services:
       PG_META_PORT: "8080"
       PG_META_DB_HOST: "host.docker.internal"
       PG_META_DB_PORT: "5432"
-      PG_META_DB_NAME: "analytics_db"
+      PG_META_DB_NAME: "postgres"
       PG_META_DB_USER: "guillaume"
       PG_META_DB_PASSWORD: "password"
       PG_META_DB_SSL_MODE: "disable"
       PG_META_QUERY_DB_HOST: "host.docker.internal"
       PG_META_QUERY_DB_PORT: "5432"
-      PG_META_QUERY_DB_NAME: "analytics_db"
+      PG_META_QUERY_DB_NAME: "postgres"
       PG_META_QUERY_DB_USER: "guillaume"
       PG_META_QUERY_DB_PASSWORD: "password"
     extra_hosts:

@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import type { SiteSummary } from '@/lib/types'
+import { formatNumber } from '@/lib/format'
 
 interface SiteCardProps {
   site: SiteSummary
@@ -111,7 +112,7 @@ export function SiteCard({ site, pinned, onDelete, onTogglePin }: SiteCardProps)
             {/* Left: Value */}
             <div className="flex-shrink-0">
               <div className="text-3xl font-bold text-foreground leading-tight">
-                {site.visitors24h.toLocaleString()}
+                {formatNumber(site.visitors24h)}
               </div>
               <div className="text-xs text-muted-foreground mt-0.5">
                 last 24 hours
