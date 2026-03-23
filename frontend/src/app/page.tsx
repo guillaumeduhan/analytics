@@ -76,8 +76,6 @@ export default function HomePage() {
       <Header />
 
       <main className="max-w-6xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold text-foreground mb-8">My personal sites</h1>
-
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
