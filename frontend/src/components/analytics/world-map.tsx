@@ -18,7 +18,7 @@ export function WorldMap({ data }: WorldMapProps) {
             <TabsTrigger
               key={tab}
               value={tab.toLowerCase()}
-              className="px-0 py-1 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
+              className="px-0 py-1 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-none rounded-none"
             >
               {tab}
             </TabsTrigger>
@@ -30,23 +30,35 @@ export function WorldMap({ data }: WorldMapProps) {
       </div>
 
       <TabsContent value="map" className="mt-0">
-        <div className="relative aspect-[2/1] bg-secondary/30 rounded-lg overflow-hidden">
-          <SimplifiedWorldMap highlightedCountries={data.map((d) => d.code)} />
-        </div>
+        {data.length > 0 ? (
+          <div className="relative aspect-[2/1] bg-secondary/30 rounded-lg overflow-hidden">
+            <SimplifiedWorldMap highlightedCountries={data.map((d) => d.code)} />
+          </div>
+        ) : (
+          <div className="text-sm text-muted-foreground text-center py-8">
+            No visitor data yet
+          </div>
+        )}
       </TabsContent>
 
       <TabsContent value="countries" className="mt-0">
-        <div className="space-y-1">
-          {data.map((country) => (
-            <div
-              key={country.code}
-              className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-secondary/50"
-            >
-              <span className="text-sm text-foreground">{country.country}</span>
-              <span className="text-sm text-muted-foreground">{country.visitors}</span>
-            </div>
-          ))}
-        </div>
+        {data.length > 0 ? (
+          <div className="space-y-1">
+            {data.map((country) => (
+              <div
+                key={country.code}
+                className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-secondary/50"
+              >
+                <span className="text-sm text-foreground">{country.country}</span>
+                <span className="text-sm text-muted-foreground">{country.visitors}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-sm text-muted-foreground text-center py-8">
+            No visitor data yet
+          </div>
+        )}
       </TabsContent>
 
       <TabsContent value="regions" className="mt-0">

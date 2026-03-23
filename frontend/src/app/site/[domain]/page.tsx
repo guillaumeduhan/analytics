@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { use } from 'react'
 import Link from 'next/link'
 import { ChevronDown, Circle } from 'lucide-react'
@@ -21,19 +21,47 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
-  mockSiteStats,
-  mockTimeSeriesData,
-  mockSources,
-  mockPages,
-  mockCountries,
-  mockBrowsers,
-  mockDevices,
-  mockGoals,
-} from '@/lib/mock-data'
-import type { TimeRange } from '@/lib/types'
+  getSites,
+  getSummary,
+  getTimeseries,
+  getSources,
+  getPages,
+  getCountries,
+  getBrowsers,
+  getDevices,
+  getEvents,
+  getRealtime,
+} from '@/lib/api'
+import type {
+  TimeRange,
+  SiteStats,
+  TimeSeriesData,
+  SourceData,
+  PageData,
+  CountryData,
+  BrowserData,
+  DeviceData,
+  GoalData,
+  Site,
+} from '@/lib/types'
 
 interface PageProps {
   params: Promise<{ domain: string }>
+}
+
+const emptyStats: SiteStats = {
+  uniqueVisitors: 0,
+  totalVisits: 0,
+  totalPageviews: 0,
+  viewsPerVisit: 0,
+  bounceRate: 0,
+  visitDuration: 0,
+  uniqueVisitorsTrend: 0,
+  totalVisitsTrend: 0,
+  totalPageviewsTrend: 0,
+  viewsPerVisitTrend: 0,
+  bounceRateTrend: 0,
+  visitDurationTrend: 0,
 }
 
 export default function SiteDashboard({ params }: PageProps) {
@@ -41,7 +69,61 @@ export default function SiteDashboard({ params }: PageProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>('24h')
   const [activeMetric, setActiveMetric] = useState<string>('uniqueVisitors')
 
-  const stats = mockSiteStats
+  const [allSites, setAllSites] = useState<Site[]>([])
+  const [siteId, setSiteId] = useState<string | null>(null)
+  const [realtimeVisitors, setRealtimeVisitors] = useState(0)
+  const [stats, setStats] = useState<SiteStats>(emptyStats)
+  const [timeseries, setTimeseries] = useState<TimeSeriesData[]>([])
+  const [sources, setSources] = useState<SourceData[]>([])
+  const [pages, setPages] = useState<PageData[]>([])
+  const [countries, setCountries] = useState<CountryData[]>([])
+  const [browsers, setBrowsers] = useState<BrowserData[]>([])
+  const [devices, setDevices] = useState<DeviceData[]>([])
+  const [goals, setGoals] = useState<GoalData[]>([])
+
+  // Resolve siteId from domain
+  useEffect(() => {
+    getSites().then((sites) => {
+      setAllSites(sites)
+      const match = sites.find((s) => s.domain === decodeURIComponent(domain))
+      if (match) setSiteId(match.id)
+    }).catch(console.error)
+  }, [domain])
+
+  // Fetch all stats when siteId or timeRange changes
+  const fetchData = useCallback(async () => {
+    if (!siteId) return
+
+    try {
+      const [s, ts, src, pg, co, br, dv, ev, rt] = await Promise.all([
+        getSummary(siteId, timeRange),
+        getTimeseries(siteId, timeRange),
+        getSources(siteId, timeRange),
+        getPages(siteId, timeRange),
+        getCountries(siteId, timeRange),
+        getBrowsers(siteId, timeRange),
+        getDevices(siteId, timeRange),
+        getEvents(siteId, timeRange),
+        getRealtime(siteId),
+      ])
+
+      setStats(s)
+      setTimeseries(ts)
+      setSources(src)
+      setPages(pg)
+      setCountries(co)
+      setBrowsers(br)
+      setDevices(dv)
+      setGoals(ev)
+      setRealtimeVisitors(rt)
+    } catch (err) {
+      console.error('Failed to fetch stats:', err)
+    }
+  }, [siteId, timeRange])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   return (
     <div className="min-h-screen bg-background">
@@ -55,27 +137,23 @@ export default function SiteDashboard({ params }: PageProps) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 text-foreground font-medium">
                   <Link href="/" className="hover:underline">
-                    {domain}
+                    {decodeURIComponent(domain)}
                   </Link>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem asChild>
-                  <Link href="/site/ceowire.co">ceowire.co</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/site/oksaas.co">oksaas.co</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/site/guillaume.ceo">guillaume.ceo</Link>
-                </DropdownMenuItem>
+                {allSites.map((s) => (
+                  <DropdownMenuItem key={s.id} asChild>
+                    <Link href={`/site/${s.domain}`}>{s.domain}</Link>
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
             <div className="flex items-center gap-2 text-sm text-success">
               <Circle className="w-2 h-2 fill-current" />
-              <span>0 current visitors</span>
+              <span>{realtimeVisitors} current visitor{realtimeVisitors !== 1 ? 's' : ''}</span>
             </div>
           </div>
 
@@ -135,7 +213,7 @@ export default function SiteDashboard({ params }: PageProps) {
         {/* Main Chart */}
         <Card className="mb-3 border-0 bg-card">
           <CardContent className="p-4">
-            <VisitorsChart data={mockTimeSeriesData} />
+            <VisitorsChart data={timeseries} />
           </CardContent>
         </Card>
 
@@ -151,7 +229,7 @@ export default function SiteDashboard({ params }: PageProps) {
                   { value: 'campaigns', label: 'CAMPAIGNS' },
                 ]}
                 defaultTab="sources"
-                data={mockSources}
+                data={sources}
                 columns={[
                   {
                     key: 'source',
@@ -179,7 +257,7 @@ export default function SiteDashboard({ params }: PageProps) {
                   { value: 'exit', label: 'EXIT PAGES' },
                 ]}
                 defaultTab="top"
-                data={mockPages}
+                data={pages}
                 columns={[
                   { key: 'pathname', header: 'Page' },
                   { key: 'visitors', header: 'Visitors' },
@@ -194,7 +272,7 @@ export default function SiteDashboard({ params }: PageProps) {
           {/* World Map */}
           <Card className="border-0 bg-card">
             <CardContent className="p-6">
-              <WorldMap data={mockCountries} />
+              <WorldMap data={countries} />
             </CardContent>
           </Card>
 
@@ -208,7 +286,7 @@ export default function SiteDashboard({ params }: PageProps) {
                   { value: 'devices', label: 'DEVICES' },
                 ]}
                 defaultTab="browsers"
-                data={mockBrowsers}
+                data={browsers}
                 columns={[
                   {
                     key: 'browser',
@@ -230,7 +308,7 @@ export default function SiteDashboard({ params }: PageProps) {
         {/* Goals */}
         <Card className="border-0 bg-card">
           <CardContent className="p-6">
-            <GoalsTable data={mockGoals} />
+            <GoalsTable data={goals} />
           </CardContent>
         </Card>
       </main>

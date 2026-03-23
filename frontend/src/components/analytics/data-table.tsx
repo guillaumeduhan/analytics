@@ -32,7 +32,7 @@ export function DataTable<T extends Record<string, unknown>>({
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="px-0 py-1 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
+              className="px-0 py-1 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-none rounded-none"
             >
               {tab.label}
             </TabsTrigger>

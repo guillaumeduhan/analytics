@@ -8,14 +8,22 @@ interface VisitorsChartProps {
 }
 
 export function VisitorsChart({ data }: VisitorsChartProps) {
+  const chartData = data.length > 0 ? data : [
+    { timestamp: '00:00', visitors: 0 },
+    { timestamp: '06:00', visitors: 0 },
+    { timestamp: '12:00', visitors: 0 },
+    { timestamp: '18:00', visitors: 0 },
+    { timestamp: '23:59', visitors: 0 },
+  ]
+
   return (
     <div className="h-80 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 30, left: -20, bottom: 0 }}>
+        <AreaChart data={chartData} margin={{ top: 10, right: 30, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="visitorsGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.3} />
-              <stop offset="100%" stopColor="#a78bfa" stopOpacity={0} />
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.3} />
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
             </linearGradient>
           </defs>
           <XAxis
@@ -31,6 +39,7 @@ export function VisitorsChart({ data }: VisitorsChartProps) {
             tick={{ fill: '#9ca3af', fontSize: 12 }}
             tickMargin={8}
             allowDecimals={false}
+            domain={[0, (max: number) => (max > 0 ? max : 10)]}
           />
           <Tooltip
             contentStyle={{
@@ -40,12 +49,12 @@ export function VisitorsChart({ data }: VisitorsChartProps) {
               padding: '12px',
             }}
             labelStyle={{ color: '#f3f4f6', fontWeight: 600, fontSize: 13 }}
-            itemStyle={{ color: '#a78bfa', fontSize: 13 }}
+            itemStyle={{ color: '#3b82f6', fontSize: 13 }}
           />
           <Area
             type="monotone"
             dataKey="visitors"
-            stroke="#a78bfa"
+            stroke="#3b82f6"
             strokeWidth={2}
             fill="url(#visitorsGradient)"
             isAnimationActive={true}

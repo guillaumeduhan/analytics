@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { createSite } from '@/lib/api'
 import type { SiteSummary } from '@/lib/types'
 
 interface AddSiteDialogProps {
@@ -54,21 +55,22 @@ export function AddSiteDialog({ onAdd }: AddSiteDialogProps) {
     if (status !== 'valid') return
     setIsLoading(true)
 
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
     const cleaned = cleanDomain(domain)
-    const newSite: SiteSummary = {
-      id: Date.now().toString(),
-      domain: cleaned,
-      name: cleaned,
-      public: false,
-      created_at: new Date().toISOString(),
-      visitors24h: 0,
-      trend: 0,
-      sparklineData: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    }
 
-    onAdd(newSite)
+    try {
+      const site = await createSite(cleaned, cleaned)
+      const newSite: SiteSummary = {
+        ...site,
+        visitors24h: 0,
+        trend: 0,
+        sparklineData: [],
+      }
+      onAdd(newSite)
+    } catch (err) {
+      console.error('Failed to create site:', err)
+      setIsLoading(false)
+      return
+    }
     setDomain('')
     setStatus('idle')
     setIsLoading(false)

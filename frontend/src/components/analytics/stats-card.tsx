@@ -18,7 +18,7 @@ export function StatsCard({ label, value, trend, active, onClick }: StatsCardPro
     <button
       onClick={onClick}
       className={`flex flex-col items-start gap-1 px-4 py-3 rounded-lg transition-colors text-left ${
-        active ? 'bg-secondary' : 'hover:bg-secondary/50'
+        active ? 'bg-secondary/50' : 'hover:bg-secondary/30'
       }`}
     >
       <span

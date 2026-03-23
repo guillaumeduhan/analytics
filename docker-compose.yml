@@ -1,0 +1,60 @@
+services:
+  studio:
+    image: supabase/studio:latest
+    ports:
+      - "3001:3000"
+    environment:
+      HOSTNAME: "0.0.0.0"
+      STUDIO_PG_META_URL: "http://meta:8080"
+      SUPABASE_URL: "http://rest:3000"
+      NEXT_PUBLIC_SUPABASE_URL: "http://rest:3000"
+      SUPABASE_REST_URL: "http://rest:3000"
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
+      SUPABASE_SERVICE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
+      NEXT_ANALYTICS_BACKEND_PROVIDER: ""
+      EDGE_FUNCTIONS_MANAGEMENT_FOLDER: "/tmp/edge-functions"
+      SUPABASE_PUBLIC_URL: "http://localhost:3001"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
+      LOGFLARE_URL: "http://localhost:4000"
+      LOGFLARE_API_KEY: "dummy"
+      NEXT_PUBLIC_ENABLE_LOGS: "false"
+      NEXT_PUBLIC_GOTRUE_URL: "http://localhost:9999"
+      NEXT_PUBLIC_SITE_URL: "http://localhost:3001"
+    volumes:
+      - edge-functions:/tmp/edge-functions
+    depends_on:
+      - meta
+      - rest
+  rest:
+    image: postgrest/postgrest:v12.2.3
+    ports:
+      - "3002:3000"
+    environment:
+      PGRST_DB_URI: "postgres://guillaume:password@host.docker.internal:5432/analytics_db"
+      PGRST_DB_SCHEMAS: "public"
+      PGRST_DB_ANON_ROLE: "guillaume"
+      PGRST_JWT_SECRET: "super-secret-jwt-token-with-at-least-32-characters-long"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  meta:
+    image: supabase/postgres-meta:v0.96.1
+    ports:
+      - "8080:8080"
+    environment:
+      PG_META_PORT: "8080"
+      PG_META_DB_HOST: "host.docker.internal"
+      PG_META_DB_PORT: "5432"
+      PG_META_DB_NAME: "analytics_db"
+      PG_META_DB_USER: "guillaume"
+      PG_META_DB_PASSWORD: "password"
+      PG_META_DB_SSL_MODE: "disable"
+      PG_META_QUERY_DB_HOST: "host.docker.internal"
+      PG_META_QUERY_DB_PORT: "5432"
+      PG_META_QUERY_DB_NAME: "analytics_db"
+      PG_META_QUERY_DB_USER: "guillaume"
+      PG_META_QUERY_DB_PASSWORD: "password"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "db:host-gateway"
+volumes:
+  edge-functions:
