@@ -20,4 +20,4 @@ gmc:
 	git checkout -
 
 dev:
-	npm run start:dev
+	npm i && npm run start:dev
