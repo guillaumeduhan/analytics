@@ -1,23 +1,83 @@
 -- ============================================================
--- Seed: 6 months of fake analytics data
--- Run: psql -U <user> -d analytics_db -f seed.sql
+-- Seed: 6 months of analytics data (~50 sessions/day)
+-- Run: sudo -u postgres psql -d postgres -f seed.sql
 -- ============================================================
 
--- Use the existing sites (or create them if missing)
+-- Create tables if they don't exist
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+CREATE TABLE IF NOT EXISTS sites (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  domain      TEXT NOT NULL UNIQUE,
+  name        TEXT NOT NULL,
+  public      BOOLEAN NOT NULL DEFAULT false,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  site_id        UUID NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
+  visitor_id     TEXT NOT NULL,
+  country        TEXT,
+  city           TEXT,
+  device         TEXT,
+  browser        TEXT,
+  os             TEXT,
+  referrer       TEXT,
+  utm_source     TEXT,
+  utm_medium     TEXT,
+  utm_campaign   TEXT,
+  duration       INTEGER NOT NULL DEFAULT 0,
+  pageview_count INTEGER NOT NULL DEFAULT 0,
+  started_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS pageviews (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  site_id     UUID NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
+  session_id  UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+  visitor_id  TEXT NOT NULL,
+  pathname    TEXT NOT NULL,
+  referrer    TEXT,
+  duration    INTEGER NOT NULL DEFAULT 0,
+  timestamp   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS events (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  site_id     UUID NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
+  session_id  UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+  visitor_id  TEXT NOT NULL,
+  name        TEXT NOT NULL,
+  props       JSONB,
+  timestamp   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_site_id    ON sessions(site_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_started_at ON sessions(started_at);
+CREATE INDEX IF NOT EXISTS idx_sessions_visitor    ON sessions(visitor_id);
+CREATE INDEX IF NOT EXISTS idx_pageviews_site_id   ON pageviews(site_id);
+CREATE INDEX IF NOT EXISTS idx_pageviews_timestamp ON pageviews(timestamp);
+CREATE INDEX IF NOT EXISTS idx_pageviews_pathname  ON pageviews(pathname);
+CREATE INDEX IF NOT EXISTS idx_events_site_id      ON events(site_id);
+CREATE INDEX IF NOT EXISTS idx_events_name         ON events(name);
+CREATE INDEX IF NOT EXISTS idx_events_timestamp    ON events(timestamp);
+
+-- Insert sites
 INSERT INTO sites (domain, name, public) VALUES
   ('guillaume.ceo', 'Guillaume CEO', true),
   ('ceowire.co', 'CEO Wire', false),
   ('oksaas.co', 'OK SaaS', false)
 ON CONFLICT (domain) DO NOTHING;
 
--- Generate fake data using a DO block
+-- Generate 6 months of data (~50 sessions/day per site)
 DO $$
 DECLARE
   site RECORD;
   day_offset INTEGER;
   hour_offset INTEGER;
-  sessions_per_day INTEGER;
   i INTEGER;
+  j INTEGER;
   v_visitor TEXT;
   v_session UUID;
   v_timestamp TIMESTAMPTZ;
@@ -35,10 +95,10 @@ DECLARE
   v_country_idx INTEGER;
   v_pageview_count INTEGER;
   v_duration INTEGER;
+  v_sessions_today INTEGER;
 BEGIN
   FOR site IN SELECT id, domain FROM sites WHERE domain IN ('guillaume.ceo','ceowire.co','oksaas.co') LOOP
 
-    -- Site-specific pages
     IF site.domain = 'guillaume.ceo' THEN
       v_pages := ARRAY['/','/about','/projects','/blog','/blog/building-analytics','/blog/raspberry-pi-setup','/blog/nestjs-guide','/contact','/ceo-portraits','/resume'];
     ELSIF site.domain = 'ceowire.co' THEN
@@ -47,21 +107,14 @@ BEGIN
       v_pages := ARRAY['/','/pricing','/features','/docs','/blog','/blog/saas-metrics','/login','/signup','/changelog','/about'];
     END IF;
 
-    -- Loop over last 180 days
     FOR day_offset IN 0..179 LOOP
 
-      -- More traffic on weekdays, growing over time
-      sessions_per_day := GREATEST(1,
-        (CASE
-          WHEN site.domain = 'guillaume.ceo' THEN 5 + (day_offset / 10)
-          WHEN site.domain = 'ceowire.co' THEN 8 + (day_offset / 8)
-          ELSE 2 + (day_offset / 15)
-        END)
-        * (CASE WHEN EXTRACT(DOW FROM (NOW() - (day_offset || ' days')::INTERVAL)) IN (0,6) THEN 0.5 ELSE 1.0 END)::INTEGER
-        + (random() * 5)::INTEGER
-      );
+      v_sessions_today := 40 + (random() * 20)::INTEGER;
+      IF EXTRACT(DOW FROM (NOW() - (day_offset || ' days')::INTERVAL)) IN (0,6) THEN
+        v_sessions_today := (v_sessions_today * 0.6)::INTEGER;
+      END IF;
 
-      FOR i IN 1..sessions_per_day LOOP
+      FOR i IN 1..v_sessions_today LOOP
         v_visitor := 'v_' || md5(random()::TEXT || i::TEXT || day_offset::TEXT);
         v_session := gen_random_uuid();
         hour_offset := (random() * 23)::INTEGER;
@@ -89,7 +142,6 @@ BEGIN
           v_timestamp
         );
 
-        -- Insert pageviews for this session
         FOR j IN 1..v_pageview_count LOOP
           v_page := v_pages[(random() * (array_length(v_pages, 1) - 1))::INTEGER + 1];
           INSERT INTO pageviews (site_id, session_id, visitor_id, pathname, referrer, duration, timestamp)
@@ -104,8 +156,7 @@ BEGIN
           );
         END LOOP;
 
-        -- 10% chance of an event per session
-        IF random() < 0.1 THEN
+        IF random() < 0.15 THEN
           INSERT INTO events (site_id, session_id, visitor_id, name, props, timestamp)
           VALUES (
             site.id,
