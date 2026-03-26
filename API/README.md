@@ -1,10 +1,12 @@
 # Analytics-G API
 
-Backend API for Analytics-G — a self-hosted, privacy-friendly web analytics platform.
+Backend API for Analytics-G — a self-hosted, privacy-friendly, **multi-site** web analytics platform.
+
+![Analytics-G Dashboard](dashboard.jpeg)
 
 ## About
 
-Analytics-G API is the server-side engine of the Analytics-G ecosystem. It collects pageviews, events, and session data from tracked websites, then exposes statistics endpoints for the dashboard. Built to run on a Raspberry Pi 4 with PostgreSQL 17.
+Analytics-G API is the server-side engine of the Analytics-G ecosystem. It collects pageviews, events, and session data from **multiple websites** through a single deployment, then exposes statistics endpoints for the dashboard. Track all your domains from one place. Built to run on a Raspberry Pi 4 with PostgreSQL 17.
 
 - **Collect** — ingest pageviews, custom events, and time-on-page duration
 - **Sites** — register and manage tracked domains
