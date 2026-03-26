@@ -1,87 +1,94 @@
 # Analytics-G
 
-Self-hosted, privacy-friendly web analytics platform — track pageviews, events, and visitor sessions without third-party services.
+Self-hosted, privacy-friendly, **multi-site** web analytics — track pageviews, events, and visitor sessions across all your domains without third-party services.
 
-## About
+![Analytics-G Dashboard](dashboard.jpeg)
 
-Analytics-G is a lightweight analytics solution designed to run on minimal hardware (Raspberry Pi 4). It provides a full-stack alternative to Google Analytics with complete data ownership.
+## Get started
 
-- **Pageview tracking** — automatic page load and navigation tracking
-- **Custom events** — track clicks, form submissions, conversions with custom properties
-- **Session management** — visitor sessions with device, browser, OS, and geo data
-- **UTM campaigns** — source, medium, and campaign attribution
-- **Realtime** — live visitor count
-- **Dashboard stats** — summary, timeseries, top pages, referrers, countries, device/browser/OS breakdown
-- **Swagger docs** — auto-generated API documentation at `/docs`
-- **Privacy-first** — no cookies, no personal data, self-hosted
-
-## Project Structure
-
-```
-analytics-g/
-├── API/          # NestJS backend — data collection & stats endpoints
-└── frontend/     # Next.js dashboard — analytics UI
-```
-
-## Quick Start
+### 1. Clone the project
 
 ```bash
 git clone https://github.com/guillaumeduhan/analytics.git
 cd analytics
+```
+
+### 2. Run the installer
+
+```bash
+chmod +x install.sh
 ./install.sh
 ```
 
-This installs all dependencies (API + Frontend), sets up `.env` files, and runs the database schema.
+The script checks your machine and installs what's missing (Node.js, yarn, PostgreSQL, PM2). Then it sets up the API and the frontend for you.
 
-### Prerequisites
+### 3. Configure your environment
 
-- **Node.js** >= 18
-- **PostgreSQL** 17
-- **yarn** (frontend) / **npm** (API)
+After install, edit these two files with your own values:
 
-### Manual Setup
+- `API/.env` — database credentials and API key
+- `frontend/.env.local` — API URL
 
-#### API
+### 4. Start the project
+
+**Development:**
 
 ```bash
+# Terminal 1 — API
 cd API
-npm install
-cp .env.EXAMPLE .env   # configure your database credentials
 npm run start:dev
-```
 
-The API will be available at `http://localhost:4200`, Swagger docs at `http://localhost:4200/docs`, and health check at `http://localhost:4200/health`.
-
-#### Frontend
-
-```bash
+# Terminal 2 — Frontend
 cd frontend
-yarn install
 yarn dev
 ```
 
-The dashboard will be available at `http://localhost:3000`.
+- API: http://localhost:4200
+- API docs: http://localhost:4200/docs
+- Frontend: http://localhost:3000
 
-### Production
+**Production (PM2):**
 
 ```bash
-# API (PM2)
-cd API
-npm run build
+cd API && npm run build
+cd ../frontend && yarn build
 pm2 start ecosystem.config.js
-
-# Frontend
-cd frontend
-yarn build
-yarn start
 ```
 
-## Tech Stack
+## Project structure
+
+```
+analytics/
+├── API/                  # NestJS backend
+├── frontend/             # Next.js dashboard
+├── ecosystem.config.js   # PM2 config (API + frontend)
+├── install.sh            # Auto-installer
+└── makefile              # Shortcuts
+```
+
+## Tech stack
 
 | Component | Technology |
 |---|---|
-| Frontend | Next.js 16, React 19, Tailwind CSS 4, Recharts, shadcn/ui |
-| API | NestJS 11, TypeScript 5 |
-| Database | PostgreSQL 17, TypeORM |
+| Frontend | Next.js, React, Tailwind CSS, Recharts, shadcn/ui |
+| API | NestJS, TypeScript |
+| Database | PostgreSQL, TypeORM |
 | Hosting | Raspberry Pi 4 |
 | Process Manager | PM2 |
+| Tunnel | Cloudflare Tunnel |
+
+## Features
+
+- Pageview tracking — automatic page load and navigation
+- Custom events — clicks, form submissions, conversions
+- Session management — device, browser, OS, geo data
+- UTM campaigns — source, medium, campaign attribution
+- Realtime — live visitor count
+- Multi-site — track all your domains from one dashboard
+- Privacy-first — no cookies, no personal data, self-hosted
+- API key auth — protected endpoints with X-API-Key header
+- Swagger docs — auto-generated at /docs
+
+## License
+
+MIT
