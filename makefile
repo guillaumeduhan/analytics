@@ -21,3 +21,7 @@ gmc:
 
 dev:
 	npm run start:dev
+
+deploy:
+	git pull origin main
+	cd API && npm run build && pm2 restart all
