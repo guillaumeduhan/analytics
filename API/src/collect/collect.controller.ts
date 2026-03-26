@@ -1,5 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from '../auth/public.decorator';
 import { CollectService } from './collect.service';
 import {
   CollectPageviewDto,
@@ -7,6 +8,7 @@ import {
   UpdateDurationDto,
 } from './collect.dto';
 
+@Public()
 @ApiTags('collect')
 @Controller('collect')
 export class CollectController {

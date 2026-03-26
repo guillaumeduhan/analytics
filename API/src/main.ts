@@ -13,6 +13,7 @@ async function bootstrap() {
     .setTitle('Analytics-G API')
     .setDescription('Self-hosted analytics API')
     .setVersion('1.0')
+    .addApiKey({ type: 'apiKey', name: 'X-API-Key', in: 'header' }, 'api-key')
     .build();
   SwaggerModule.setup('docs', app, SwaggerModule.createDocument(app, config));
 

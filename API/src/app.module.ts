@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
 import { Site, Session, Pageview, Event } from './entities';
 import { CollectModule } from './collect/collect.module';
 import { StatsModule } from './stats/stats.module';
@@ -9,6 +10,7 @@ import { HealthModule } from './health/health.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { PageviewsModule } from './pageviews/pageviews.module';
 import { EventsModule } from './events/events.module';
+import { ApiKeyGuard } from './auth/api-key.guard';
 
 @Module({
   imports: [
@@ -33,6 +35,9 @@ import { EventsModule } from './events/events.module';
     PageviewsModule,
     EventsModule,
     HealthModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: ApiKeyGuard },
   ],
 })
 export class AppModule {}
