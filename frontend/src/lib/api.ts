@@ -13,9 +13,14 @@ import type {
 } from './types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200'
+const API_KEY = process.env.API_KEY || ''
+
+const authHeaders: Record<string, string> = {
+  'X-API-Key': API_KEY,
+}
 
 async function fetchApi<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`)
+  const res = await fetch(`${API_URL}${path}`, { headers: authHeaders })
   if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`)
   return res.json()
 }
@@ -69,7 +74,7 @@ export async function getSites(): Promise<SiteSummary[]> {
 export async function createSite(domain: string, name: string): Promise<Site> {
   const res = await fetch(`${API_URL}/sites`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders },
     body: JSON.stringify({ domain, name }),
   })
   if (!res.ok) throw new Error(`API error: ${res.status}`)
@@ -77,7 +82,7 @@ export async function createSite(domain: string, name: string): Promise<Site> {
 }
 
 export async function deleteSite(siteId: string): Promise<void> {
-  const res = await fetch(`${API_URL}/sites/${siteId}`, { method: 'DELETE' })
+  const res = await fetch(`${API_URL}/sites/${siteId}`, { method: 'DELETE', headers: authHeaders })
   if (!res.ok) throw new Error(`API error: ${res.status}`)
 }
 
