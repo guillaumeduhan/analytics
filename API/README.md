@@ -1,10 +1,12 @@
 # Analytics-G API
 
-Backend API for Analytics-G — a self-hosted, privacy-friendly web analytics platform.
+Backend API for Analytics-G — a self-hosted, privacy-friendly, **multi-site** web analytics platform.
+
+![Analytics-G Dashboard](dashboard.jpeg)
 
 ## About
 
-Analytics-G API is the server-side engine of the Analytics-G ecosystem. It collects pageviews, events, and session data from tracked websites, then exposes statistics endpoints for the dashboard. Built to run on a Raspberry Pi 4 with PostgreSQL 17.
+Analytics-G API is the server-side engine of the Analytics-G ecosystem. It collects pageviews, events, and session data from **multiple websites** through a single deployment, then exposes statistics endpoints for the dashboard. Track all your domains from one place. Built to run on a Raspberry Pi 4 with PostgreSQL 17.
 
 - **Collect** — ingest pageviews, custom events, and time-on-page duration
 - **Sites** — register and manage tracked domains
@@ -31,7 +33,7 @@ cd analytics-g/API
 npm install
 
 # Set up the database
-psql -U <user> -d analytics_db -f database.sql
+psql -U <user> -d postgres -f database.sql
 
 # Set up environment variables
 cp .env.EXAMPLE .env
@@ -48,6 +50,7 @@ cp .env.EXAMPLE .env
 | `DATABASE_PASSWORD` | PostgreSQL password |
 | `DATABASE_NAME` | PostgreSQL database name |
 | `PORT` | API port (default `4200`) |
+| `API_KEY` | API key for authenticated endpoints |
 
 ### Running
 
@@ -92,6 +95,9 @@ API/
 │   │   ├── sites.service.ts
 │   │   ├── sites.module.ts
 │   │   └── sites.dto.ts
+│   ├── auth/                    # API key authentication
+│   │   ├── api-key.guard.ts        # Global guard checking X-API-Key header
+│   │   └── public.decorator.ts     # @Public() decorator to bypass auth
 │   ├── health/                  # Health check endpoint
 │   │   ├── health.controller.ts    # GET /health
 │   │   └── health.module.ts
@@ -129,3 +135,4 @@ API/
 - **Stats queries**: All stats endpoints accept a `period` query param (`today`, `7d`, `30d`, `12m`) and return aggregated data per site
 - **Realtime**: `GET /stats/:siteId/realtime` returns visitors active in the last 5 minutes
 - **CORS enabled**: The API allows cross-origin requests so the tracking script can be embedded on any website
+- **API key authentication**: All endpoints except `/collect/*` and `/health` require a valid `X-API-Key` header. Collection endpoints are public so tracking scripts can send data without exposing the key
