@@ -24,4 +24,6 @@ dev:
 
 deploy:
 	git pull origin main
-	cd API && npm run build && pm2 restart all
+	cd API && npm run build
+	cd frontend && npm run build
+	pm2 delete all && pm2 start ecosystem.config.js && pm2 save
