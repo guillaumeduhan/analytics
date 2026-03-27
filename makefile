@@ -23,6 +23,7 @@ dev:
 	npm run start:dev
 
 deploy:
+	rm -f frontend/package-lock.json
 	git pull origin main
 	cd API && npm run build
 	cd frontend && npm run build

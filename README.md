@@ -4,28 +4,6 @@ Self-hosted, privacy-friendly, **multi-site** web analytics — track pageviews,
 
 ![Analytics-G Dashboard](dashboard.jpeg)
 
-## Add the tracking script
-
-Once your instance is running, add this snippet to the `<head>` of every site you want to track:
-
-```html
-<script defer data-domain="YOUR_DOMAIN" src="YOUR_API_URL/js/tracker.js"></script>
-```
-
-Replace `YOUR_API_URL` with your API base URL and `YOUR_DOMAIN` with the site domain registered in your dashboard.
-
-Example:
-
-```html
-<script defer data-domain="guillaume.ceo" src="https://analytics.guillaume.ceo/js/tracker.js"></script>
-```
-
-To track custom events from your code:
-
-```js
-ag("Signup", { plan: "pro" });
-```
-
 ## Get started
 
 ### 1. Clone the project
@@ -44,14 +22,30 @@ chmod +x install.sh
 
 The script checks your machine and installs what's missing (Node.js, yarn, PostgreSQL, PM2). Then it sets up the API and the frontend for you.
 
-### 3. Configure your environment
+### 3. Add the tracking script
+
+Add this snippet to the `<head>` of every site you want to track:
+
+```html
+<script defer data-domain="YOUR_DOMAIN" src="YOUR_API_URL/js/tracker.js"></script>
+```
+
+Replace `YOUR_API_URL` with your API base URL and `YOUR_DOMAIN` with the site domain registered in your dashboard.
+
+To track custom events from your code:
+
+```js
+ag("Signup", { plan: "pro" });
+```
+
+### 4. Configure your environment (skip if already done)
 
 After install, edit these two files with your own values:
 
 - `API/.env` — database credentials and API key
 - `frontend/.env.local` — API URL
 
-### 4. Start the project
+### 5. Start the project
 
 **Development:**
 
