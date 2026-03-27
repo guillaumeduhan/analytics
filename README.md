@@ -22,9 +22,59 @@ chmod +x install.sh
 
 The script checks your machine and installs what's missing (Node.js, yarn, PostgreSQL, PM2). Then it sets up the API and the frontend for you.
 
-### 3. Add the tracking script
+### 3. Configure your environment
 
-Add this snippet to the `<head>` of every site you want to track:
+The installer creates `.env` files from examples. Edit them with your own values:
+
+**API** (`API/.env`):
+
+| Variable | Description |
+|---|---|
+| `DATABASE_HOST` | PostgreSQL host (e.g. `localhost`) |
+| `DATABASE_PORT` | PostgreSQL port (default: `5432`) |
+| `DATABASE_USER` | PostgreSQL user |
+| `DATABASE_PASSWORD` | PostgreSQL password |
+| `DATABASE_NAME` | Database name (e.g. `analytics`) |
+| `PORT` | API port (default: `4200`) |
+| `API_KEY` | Secret key to protect your API endpoints |
+
+**Frontend** (`frontend/.env.local`):
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | Your API URL (e.g. `http://localhost:4200`) |
+| `API_KEY` | Same API key as in `API/.env` |
+
+The `API_KEY` must match in both files.
+
+### 4. Start the project
+
+**Development:**
+
+```bash
+make dev
+```
+
+Or manually:
+
+```bash
+cd API && npm run start:dev
+cd frontend && yarn dev
+```
+
+- API: http://localhost:4200
+- API docs: http://localhost:4200/docs
+- Frontend: http://localhost:3000
+
+**Production:**
+
+```bash
+make deploy
+```
+
+### 5. Add the tracking script
+
+Once your instance is running, add this snippet to the `<head>` of every site you want to track:
 
 ```html
 <script defer data-domain="YOUR_DOMAIN" src="YOUR_API_URL/js/tracker.js"></script>
@@ -32,43 +82,10 @@ Add this snippet to the `<head>` of every site you want to track:
 
 Replace `YOUR_API_URL` with your API base URL and `YOUR_DOMAIN` with the site domain registered in your dashboard.
 
-To track custom events from your code:
+To track custom events:
 
 ```js
 ag("Signup", { plan: "pro" });
-```
-
-### 4. Configure your environment (skip if already done)
-
-After install, edit these two files with your own values:
-
-- `API/.env` — database credentials and API key
-- `frontend/.env.local` — API URL
-
-### 5. Start the project
-
-**Development:**
-
-```bash
-# Terminal 1 — API
-cd API
-npm run start:dev
-
-# Terminal 2 — Frontend
-cd frontend
-yarn dev
-```
-
-- API: http://localhost:4200
-- API docs: http://localhost:4200/docs
-- Frontend: http://localhost:3000
-
-**Production (PM2):**
-
-```bash
-cd API && npm run build
-cd ../frontend && yarn build
-pm2 start ecosystem.config.js
 ```
 
 ## Project structure
@@ -89,9 +106,9 @@ analytics/
 | Frontend | Next.js, React, Tailwind CSS, Recharts, shadcn/ui |
 | API | NestJS, TypeScript |
 | Database | PostgreSQL, TypeORM |
-| Hosting | Raspberry Pi 4 |
-| Process Manager | PM2 |
-| Tunnel | Cloudflare Tunnel |
+| Hosting | Raspberry Pi 4 *(optional, self-hosted)* |
+| Process Manager | PM2 *(optional, self-hosted)* |
+| Tunnel | Cloudflare Tunnel *(optional, self-hosted)* |
 
 ## Features
 

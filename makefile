@@ -27,4 +27,7 @@ deploy:
 	git pull origin main
 	cd API && npm install && npm run build
 	cd frontend && npm install && npm run build
-	pm2 delete all && pm2 start ecosystem.config.js && pm2 save
+	pm2 delete all || true
+	kill $$(lsof -ti:4200) 2>/dev/null || true
+	kill $$(lsof -ti:3000) 2>/dev/null || true
+	pm2 start ecosystem.config.js && pm2 save
