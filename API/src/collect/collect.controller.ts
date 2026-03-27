@@ -5,7 +5,7 @@ import {
   Req,
   ForbiddenException,
 } from '@nestjs/common';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from '../auth/public.decorator';
 import { CollectService } from './collect.service';
