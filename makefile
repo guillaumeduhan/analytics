@@ -25,6 +25,6 @@ dev:
 deploy:
 	rm -f frontend/package-lock.json
 	git pull origin main
-	cd API && npm run build
-	cd frontend && npm run build
+	cd API && npm install && npm run build
+	cd frontend && npm install && npm run build
 	pm2 delete all && pm2 start ecosystem.config.js && pm2 save
