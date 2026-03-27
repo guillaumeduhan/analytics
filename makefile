@@ -24,7 +24,6 @@ dev:
 
 deploy:
 	rm -f frontend/package-lock.json frontend/yarn.lock frontend/pnpm-lock.yaml
-	rm -rf frontend/node_modules
 	sudo npm install -g yarn || true
 	git pull origin main
 	cd API && npm install && npm run build
