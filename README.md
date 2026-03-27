@@ -43,9 +43,9 @@ The installer creates `.env` files from examples. Edit them with your own values
 | Variable | Description |
 |---|---|
 | `NEXT_PUBLIC_API_URL` | Your API URL (e.g. `http://localhost:4200`) |
-| `API_KEY` | Same API key as in `API/.env` |
+| `NEXT_PUBLIC_API_KEY` | Same API key as in `API/.env` |
 
-The `API_KEY` must match in both files.
+The API key must match in both files.
 
 ### 4. Start the project
 
@@ -59,7 +59,7 @@ Or manually:
 
 ```bash
 cd API && npm run start:dev
-cd frontend && yarn dev
+cd frontend && npm run dev
 ```
 
 - API: http://localhost:4200
