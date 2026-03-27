@@ -13,7 +13,7 @@ import type {
 } from './types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200'
-const API_KEY = process.env.API_KEY || ''
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || process.env.API_KEY || ''
 
 const authHeaders: Record<string, string> = {
   'X-API-Key': API_KEY,
