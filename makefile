@@ -23,12 +23,4 @@ dev:
 	npm run start:dev
 
 deploy:
-	rm -f frontend/package-lock.json frontend/yarn.lock frontend/pnpm-lock.yaml
-	sudo npm install -g yarn || true
-	git pull origin main
-	cd API && npm install && npm run build
-	cd frontend && npm install && npm run build
-	pm2 delete all || true
-	kill $$(lsof -ti:4200) 2>/dev/null || true
-	kill $$(lsof -ti:3000) 2>/dev/null || true
-	pm2 start ecosystem.config.js && pm2 save
+	./raspberry-deploy.sh
