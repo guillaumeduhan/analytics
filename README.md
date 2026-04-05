@@ -69,11 +69,17 @@ cd frontend && npm run dev
 **Production (PM2):**
 
 ```bash
-cd API && npm run build && cd ..
-cd frontend && npm run build && cd ..
-pm2 start ecosystem.config.js
-pm2 list
+make deploy
 ```
+
+This runs `raspberry-deploy.sh` which:
+
+- pulls the latest code
+- stops and kills any existing PM2 processes
+- frees ports 4200 / 3000
+- wipes `node_modules`, lockfiles, `dist`, and `.next` (full clean reinstall)
+- reinstalls and rebuilds API + frontend
+- starts both processes with PM2 and prints the last logs
 
 Two processes are started:
 
