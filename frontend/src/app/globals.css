@@ -134,4 +134,21 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Clamp font weights: min 400, max 600 */
+  .font-thin,
+  .font-extralight,
+  .font-light,
+  .font-normal {
+    font-weight: 400;
+  }
+  .font-medium {
+    font-weight: 500;
+  }
+  .font-semibold,
+  .font-bold,
+  .font-extrabold,
+  .font-black {
+    font-weight: 600;
+  }
 }
