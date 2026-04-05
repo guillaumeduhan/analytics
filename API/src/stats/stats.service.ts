@@ -160,7 +160,7 @@ export class StatsService {
         const sub = qb
           .subQuery()
           .select('MIN(p2.timestamp)')
-          .from('pageview', 'p2')
+          .from('pageviews', 'p2')
           .where('p2.session_id = p.session_id')
           .getQuery();
         return `p.timestamp = ${sub}`;
@@ -186,7 +186,7 @@ export class StatsService {
         const sub = qb
           .subQuery()
           .select('MAX(p2.timestamp)')
-          .from('pageview', 'p2')
+          .from('pageviews', 'p2')
           .where('p2.session_id = p.session_id')
           .getQuery();
         return `p.timestamp = ${sub}`;
