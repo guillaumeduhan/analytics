@@ -66,11 +66,21 @@ cd frontend && npm run dev
 - API docs: http://localhost:4200/docs
 - Frontend: http://localhost:3000
 
-**Production:**
+**Production (PM2):**
 
 ```bash
-make deploy
+cd API && npm run build && cd ..
+cd frontend && npm run build && cd ..
+pm2 start ecosystem.config.js
+pm2 list
 ```
+
+Two processes are started:
+
+| Process | Port |
+|---|---|
+| `analytics-api-4200` | 4200 |
+| `analytics-front-3000` | 3000 |
 
 ### 5. Add the tracking script
 
