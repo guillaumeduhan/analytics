@@ -26,6 +26,7 @@ cd ..
 
 echo "→ clean frontend"
 cd frontend
+rm -f yarn.lock pnpm-lock.yaml
 rm -rf .next node_modules/.cache
 npm install
 npm run build
