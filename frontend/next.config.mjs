@@ -12,9 +12,6 @@ const nextConfig = {
       },
     ],
   },
-  turbopack: {
-    root: '/Users/guillaume/Desktop/GUILLAUME/DEV/analytics-g/frontend',
-  },
 }
 
 export default nextConfig
