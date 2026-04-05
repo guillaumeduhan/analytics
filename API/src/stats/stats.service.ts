@@ -23,7 +23,7 @@ export class StatsService {
     const from = new Date();
     switch (period) {
       case 'today':
-        from.setHours(0, 0, 0, 0);
+        from.setHours(from.getHours() - 24);
         break;
       case '7d':
         from.setDate(from.getDate() - 7);
