@@ -150,8 +150,6 @@ export async function getTimeseries(siteId: string, timeRange: TimeRange): Promi
     timestamp: new Date(r.date).toLocaleString('en-US', {
       day: '2-digit',
       month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
     }),
     visitors: r.visitors,
     visits: r.visits,
