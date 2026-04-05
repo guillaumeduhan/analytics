@@ -99,8 +99,12 @@ export async function getSummary(siteId: string, timeRange: TimeRange): Promise<
     ),
   ])
 
+  const daysByRange: Record<TimeRange, number> = { '24h': 1, '7d': 7, '30d': 30, '12m': 365, 'all': 365 }
+  const days = daysByRange[timeRange] || 1
+
   return {
     uniqueVisitors: current.visitors,
+    averageVisitors: days > 0 ? Math.round((current.visitors / days) * 10) / 10 : 0,
     totalVisits: current.sessions,
     totalPageviews: current.pageviews,
     viewsPerVisit: current.sessions > 0 ? Math.round((current.pageviews / current.sessions) * 100) / 100 : 0,

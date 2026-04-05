@@ -47,6 +47,7 @@ export interface Event {
 
 export interface SiteStats {
   uniqueVisitors: number
+  averageVisitors: number
   totalVisits: number
   totalPageviews: number
   viewsPerVisit: number

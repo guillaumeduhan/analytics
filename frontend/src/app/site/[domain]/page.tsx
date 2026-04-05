@@ -57,6 +57,7 @@ interface PageProps {
 
 const emptyStats: SiteStats = {
   uniqueVisitors: 0,
+  averageVisitors: 0,
   totalVisits: 0,
   totalPageviews: 0,
   viewsPerVisit: 0,
@@ -193,6 +194,13 @@ export default function SiteDashboard({ params }: PageProps) {
                 onClick={() => setActiveMetric('uniqueVisitors')}
               />
               <StatsCard
+                label="Average Visitors / day"
+                value={stats.averageVisitors}
+                trend={0}
+                active={activeMetric === 'averageVisitors'}
+                onClick={() => setActiveMetric('averageVisitors')}
+              />
+              <StatsCard
                 label="Total Visits"
                 value={formatNumber(stats.totalVisits)}
                 trend={stats.totalVisitsTrend}
@@ -253,12 +261,26 @@ export default function SiteDashboard({ params }: PageProps) {
                       {
                         key: 'source',
                         header: 'Source',
-                        render: (value: unknown, item: Record<string, unknown>) => (
-                          <div className="flex items-center gap-2">
-                            <SourceIcon type={item.source as string} className="w-4 h-4 text-muted-foreground" />
-                            <span>{value as string}</span>
-                          </div>
-                        ),
+                        render: (value: unknown, item: Record<string, unknown>) => {
+                          const src = item.source as string
+                          const isDirect = src === 'Direct / None'
+                          const content = (
+                            <div className="flex items-center gap-2">
+                              <SourceIcon type={src} className="w-4 h-4 text-muted-foreground" />
+                              <span className={isDirect ? '' : 'hover:underline hover:text-primary transition-colors'}>{value as string}</span>
+                            </div>
+                          )
+                          return isDirect ? content : (
+                            <a
+                              href={`https://${src}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {content}
+                            </a>
+                          )
+                        },
                       },
                       { key: 'visitors', header: 'Visitors' },
                     ],
