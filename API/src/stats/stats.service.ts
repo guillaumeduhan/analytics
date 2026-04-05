@@ -150,19 +150,24 @@ export class StatsService {
     await this.getSite(siteId);
     const { from, to } = this.dateRange(period);
 
-    return this.pageviewRepo.query(
-      `SELECT pathname, COUNT(*)::int AS visitors
-       FROM (
-         SELECT DISTINCT ON (session_id) session_id, pathname
-         FROM pageviews
-         WHERE site_id = $1 AND timestamp BETWEEN $2 AND $3
-         ORDER BY session_id, timestamp ASC
-       ) t
-       GROUP BY pathname
-       ORDER BY visitors DESC
-       LIMIT $4`,
-      [siteId, from, to, limit],
-    );
+    try {
+      return await this.pageviewRepo.query(
+        `SELECT pathname, COUNT(*)::int AS visitors
+         FROM (
+           SELECT DISTINCT ON (session_id) session_id, pathname
+           FROM pageviews
+           WHERE site_id = $1 AND timestamp BETWEEN $2 AND $3
+           ORDER BY session_id, timestamp ASC
+         ) t
+         GROUP BY pathname
+         ORDER BY visitors DESC
+         LIMIT $4`,
+        [siteId, from, to, limit],
+      );
+    } catch (err) {
+      console.error('[entryPages] SQL error:', err);
+      throw err;
+    }
   }
 
   /** Exit pages (last page of each session) */
@@ -170,19 +175,24 @@ export class StatsService {
     await this.getSite(siteId);
     const { from, to } = this.dateRange(period);
 
-    return this.pageviewRepo.query(
-      `SELECT pathname, COUNT(*)::int AS visitors
-       FROM (
-         SELECT DISTINCT ON (session_id) session_id, pathname
-         FROM pageviews
-         WHERE site_id = $1 AND timestamp BETWEEN $2 AND $3
-         ORDER BY session_id, timestamp DESC
-       ) t
-       GROUP BY pathname
-       ORDER BY visitors DESC
-       LIMIT $4`,
-      [siteId, from, to, limit],
-    );
+    try {
+      return await this.pageviewRepo.query(
+        `SELECT pathname, COUNT(*)::int AS visitors
+         FROM (
+           SELECT DISTINCT ON (session_id) session_id, pathname
+           FROM pageviews
+           WHERE site_id = $1 AND timestamp BETWEEN $2 AND $3
+           ORDER BY session_id, timestamp DESC
+         ) t
+         GROUP BY pathname
+         ORDER BY visitors DESC
+         LIMIT $4`,
+        [siteId, from, to, limit],
+      );
+    } catch (err) {
+      console.error('[exitPages] SQL error:', err);
+      throw err;
+    }
   }
 
   /** Breakdown by country */
