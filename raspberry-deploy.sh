@@ -1,13 +1,13 @@
 #!/bin/bash
-# Deploy script for Raspberry Pi
-# Usage: ./raspberry-deploy.sh
+# Full-clean deploy script for Raspberry Pi
+# Usage: ./raspberry-deploy.sh (or `make deploy`)
 
 set -e
 
 cd "$(dirname "$0")"
 
 echo "→ git pull"
-git pull
+git pull origin main
 
 echo "→ pm2 delete all + kill daemon"
 pm2 delete all || true
@@ -15,25 +15,25 @@ pm2 kill || true
 
 echo "→ free ports 4200 / 3000"
 sudo fuser -k 4200/tcp 3000/tcp 2>/dev/null || true
-sudo lsof -i :4200 -i :3000 || echo "  ports clean"
+kill $(lsof -ti:4200) 2>/dev/null || true
+kill $(lsof -ti:3000) 2>/dev/null || true
 
-echo "→ clean API"
+echo "→ clean API (full reinstall)"
 cd API
-rm -rf dist node_modules/.cache
+rm -rf dist node_modules package-lock.json
 npm install
 npm run build
 cd ..
 
-echo "→ clean frontend"
+echo "→ clean frontend (full reinstall)"
 cd frontend
-rm -f yarn.lock pnpm-lock.yaml
-rm -rf .next node_modules/.cache
+rm -rf .next node_modules package-lock.json yarn.lock pnpm-lock.yaml
 npm install
 npm run build
 cd ..
 
 echo "→ pm2 flush + start"
-pm2 flush
+pm2 flush || true
 pm2 start ecosystem.config.js
 pm2 save
 
