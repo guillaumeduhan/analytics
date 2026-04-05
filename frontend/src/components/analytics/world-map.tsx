@@ -8,9 +8,10 @@ import { formatNumber } from '@/lib/format'
 
 interface WorldMapProps {
   data: CountryData[]
+  cities?: { city: string; visitors: number }[]
 }
 
-export function WorldMap({ data }: WorldMapProps) {
+export function WorldMap({ data, cities = [] }: WorldMapProps) {
   return (
     <Tabs defaultValue="map" className="w-full">
       <div className="flex items-center justify-between mb-4">
@@ -69,9 +70,23 @@ export function WorldMap({ data }: WorldMapProps) {
       </TabsContent>
 
       <TabsContent value="cities" className="mt-0">
-        <div className="text-sm text-muted-foreground text-center py-8">
-          No city data available
-        </div>
+        {cities.length > 0 ? (
+          <div className="space-y-1">
+            {cities.map((city) => (
+              <div
+                key={city.city}
+                className="flex items-center justify-between px-2 py-2 rounded-md hover:bg-secondary/50"
+              >
+                <span className="text-sm text-foreground">{city.city}</span>
+                <span className="text-sm text-muted-foreground">{formatNumber(city.visitors)}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-sm text-muted-foreground text-center py-8">
+            No city data yet
+          </div>
+        )}
       </TabsContent>
     </Tabs>
   )

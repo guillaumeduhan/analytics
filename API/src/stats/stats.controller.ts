@@ -36,6 +36,28 @@ export class StatsController {
     return this.statsService.topPages(siteId, period, +limit);
   }
 
+  @Get('entry-pages')
+  @ApiQuery({ name: 'period', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  entryPages(
+    @Param('siteId') siteId: string,
+    @Query('period') period = '30d',
+    @Query('limit') limit = 10,
+  ) {
+    return this.statsService.entryPages(siteId, period, +limit);
+  }
+
+  @Get('exit-pages')
+  @ApiQuery({ name: 'period', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  exitPages(
+    @Param('siteId') siteId: string,
+    @Query('period') period = '30d',
+    @Query('limit') limit = 10,
+  ) {
+    return this.statsService.exitPages(siteId, period, +limit);
+  }
+
   @Get('referrers')
   @ApiQuery({ name: 'period', required: false })
   @ApiQuery({ name: 'limit', required: false })
@@ -54,6 +76,15 @@ export class StatsController {
     @Query('period') period = '30d',
   ) {
     return this.statsService.countries(siteId, period);
+  }
+
+  @Get('cities')
+  @ApiQuery({ name: 'period', required: false })
+  cities(
+    @Param('siteId') siteId: string,
+    @Query('period') period = '30d',
+  ) {
+    return this.statsService.cities(siteId, period);
   }
 
   @Get('breakdown/:property')

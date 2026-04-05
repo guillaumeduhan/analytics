@@ -25,10 +25,15 @@ import {
   getSummary,
   getTimeseries,
   getSources,
+  getCampaigns,
   getPages,
+  getEntryPages,
+  getExitPages,
   getCountries,
+  getCities,
   getBrowsers,
   getDevices,
+  getOS,
   getEvents,
   getRealtime,
 } from '@/lib/api'
@@ -76,10 +81,15 @@ export default function SiteDashboard({ params }: PageProps) {
   const [stats, setStats] = useState<SiteStats>(emptyStats)
   const [timeseries, setTimeseries] = useState<TimeSeriesData[]>([])
   const [sources, setSources] = useState<SourceData[]>([])
+  const [campaigns, setCampaigns] = useState<SourceData[]>([])
   const [pages, setPages] = useState<PageData[]>([])
+  const [entryPages, setEntryPages] = useState<PageData[]>([])
+  const [exitPages, setExitPages] = useState<PageData[]>([])
   const [countries, setCountries] = useState<CountryData[]>([])
+  const [cities, setCities] = useState<{ city: string; visitors: number }[]>([])
   const [browsers, setBrowsers] = useState<BrowserData[]>([])
   const [devices, setDevices] = useState<DeviceData[]>([])
+  const [osData, setOsData] = useState<{ os: string; visitors: number }[]>([])
   const [goals, setGoals] = useState<GoalData[]>([])
 
   // Resolve siteId from domain
@@ -96,14 +106,19 @@ export default function SiteDashboard({ params }: PageProps) {
     if (!siteId) return
 
     try {
-      const [s, ts, src, pg, co, br, dv, ev, rt] = await Promise.all([
+      const [s, ts, src, camp, pg, ep, xp, co, ci, br, dv, os, ev, rt] = await Promise.all([
         getSummary(siteId, timeRange),
         getTimeseries(siteId, timeRange),
         getSources(siteId, timeRange),
+        getCampaigns(siteId, timeRange),
         getPages(siteId, timeRange),
+        getEntryPages(siteId, timeRange),
+        getExitPages(siteId, timeRange),
         getCountries(siteId, timeRange),
+        getCities(siteId, timeRange),
         getBrowsers(siteId, timeRange),
         getDevices(siteId, timeRange),
+        getOS(siteId, timeRange),
         getEvents(siteId, timeRange),
         getRealtime(siteId),
       ])
@@ -111,10 +126,15 @@ export default function SiteDashboard({ params }: PageProps) {
       setStats(s)
       setTimeseries(ts)
       setSources(src)
+      setCampaigns(camp)
       setPages(pg)
+      setEntryPages(ep)
+      setExitPages(xp)
       setCountries(co)
+      setCities(ci)
       setBrowsers(br)
       setDevices(dv)
+      setOsData(os)
       setGoals(ev)
       setRealtimeVisitors(rt)
     } catch (err) {
@@ -214,7 +234,7 @@ export default function SiteDashboard({ params }: PageProps) {
         {/* Main Chart */}
         <Card className="mb-3 border-0 bg-card">
           <CardContent className="p-4">
-            <VisitorsChart data={timeseries} />
+            <VisitorsChart data={timeseries} activeMetric={activeMetric} />
           </CardContent>
         </Card>
 
@@ -225,44 +245,73 @@ export default function SiteDashboard({ params }: PageProps) {
             <CardContent className="p-6">
               <DataTable
                 tabs={[
-                  { value: 'channels', label: 'CHANNELS' },
-                  { value: 'sources', label: 'SOURCES' },
-                  { value: 'campaigns', label: 'CAMPAIGNS' },
+                  {
+                    value: 'sources',
+                    label: 'SOURCES',
+                    data: sources,
+                    columns: [
+                      {
+                        key: 'source',
+                        header: 'Source',
+                        render: (value: unknown, item: Record<string, unknown>) => (
+                          <div className="flex items-center gap-2">
+                            <SourceIcon type={item.source as string} className="w-4 h-4 text-muted-foreground" />
+                            <span>{value as string}</span>
+                          </div>
+                        ),
+                      },
+                      { key: 'visitors', header: 'Visitors' },
+                    ],
+                  },
+                  {
+                    value: 'campaigns',
+                    label: 'CAMPAIGNS',
+                    data: campaigns,
+                    columns: [
+                      { key: 'source', header: 'Campaign' },
+                      { key: 'visitors', header: 'Visitors' },
+                    ],
+                  },
                 ]}
                 defaultTab="sources"
-                data={sources}
-                columns={[
-                  {
-                    key: 'source',
-                    header: 'Source',
-                    render: (value, item) => (
-                      <div className="flex items-center gap-2">
-                        <SourceIcon type={item.source as string} className="w-4 h-4 text-muted-foreground" />
-                        <span>{value as string}</span>
-                      </div>
-                    ),
-                  },
-                  { key: 'visitors', header: 'Visitors' },
-                ]}
               />
             </CardContent>
           </Card>
 
-          {/* Top Pages */}
+          {/* Pages */}
           <Card className="border-0 bg-card">
             <CardContent className="p-6">
               <DataTable
                 tabs={[
-                  { value: 'top', label: 'TOP PAGES' },
-                  { value: 'entry', label: 'ENTRY PAGES' },
-                  { value: 'exit', label: 'EXIT PAGES' },
+                  {
+                    value: 'top',
+                    label: 'TOP PAGES',
+                    data: pages,
+                    columns: [
+                      { key: 'pathname', header: 'Page' },
+                      { key: 'visitors', header: 'Visitors' },
+                    ],
+                  },
+                  {
+                    value: 'entry',
+                    label: 'ENTRY PAGES',
+                    data: entryPages,
+                    columns: [
+                      { key: 'pathname', header: 'Page' },
+                      { key: 'visitors', header: 'Visitors' },
+                    ],
+                  },
+                  {
+                    value: 'exit',
+                    label: 'EXIT PAGES',
+                    data: exitPages,
+                    columns: [
+                      { key: 'pathname', header: 'Page' },
+                      { key: 'visitors', header: 'Visitors' },
+                    ],
+                  },
                 ]}
                 defaultTab="top"
-                data={pages}
-                columns={[
-                  { key: 'pathname', header: 'Page' },
-                  { key: 'visitors', header: 'Visitors' },
-                ]}
               />
             </CardContent>
           </Card>
@@ -273,7 +322,7 @@ export default function SiteDashboard({ params }: PageProps) {
           {/* World Map */}
           <Card className="border-0 bg-card">
             <CardContent className="p-6">
-              <WorldMap data={countries} />
+              <WorldMap data={countries} cities={cities} />
             </CardContent>
           </Card>
 
@@ -282,25 +331,44 @@ export default function SiteDashboard({ params }: PageProps) {
             <CardContent className="p-6">
               <DataTable
                 tabs={[
-                  { value: 'browsers', label: 'BROWSERS' },
-                  { value: 'os', label: 'OPERATING SYSTEMS' },
-                  { value: 'devices', label: 'DEVICES' },
+                  {
+                    value: 'browsers',
+                    label: 'BROWSERS',
+                    data: browsers,
+                    columns: [
+                      {
+                        key: 'browser',
+                        header: 'Browser',
+                        render: (value: unknown) => (
+                          <div className="flex items-center gap-2">
+                            <SourceIcon type={value as string} className="w-4 h-4 text-muted-foreground" />
+                            <span>{value as string}</span>
+                          </div>
+                        ),
+                      },
+                      { key: 'visitors', header: 'Visitors' },
+                    ],
+                  },
+                  {
+                    value: 'os',
+                    label: 'OPERATING SYSTEMS',
+                    data: osData,
+                    columns: [
+                      { key: 'os', header: 'OS' },
+                      { key: 'visitors', header: 'Visitors' },
+                    ],
+                  },
+                  {
+                    value: 'devices',
+                    label: 'DEVICES',
+                    data: devices,
+                    columns: [
+                      { key: 'device', header: 'Device' },
+                      { key: 'visitors', header: 'Visitors' },
+                    ],
+                  },
                 ]}
                 defaultTab="browsers"
-                data={browsers}
-                columns={[
-                  {
-                    key: 'browser',
-                    header: 'Browser',
-                    render: (value) => (
-                      <div className="flex items-center gap-2">
-                        <SourceIcon type={value as string} className="w-4 h-4 text-muted-foreground" />
-                        <span>{value as string}</span>
-                      </div>
-                    ),
-                  },
-                  { key: 'visitors', header: 'Visitors' },
-                ]}
               />
             </CardContent>
           </Card>

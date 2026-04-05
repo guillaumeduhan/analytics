@@ -117,7 +117,7 @@ export async function getSummary(siteId: string, timeRange: TimeRange): Promise<
 
 export async function getTimeseries(siteId: string, timeRange: TimeRange): Promise<TimeSeriesData[]> {
   const period = mapPeriod(timeRange)
-  const rows = await fetchApi<{ date: string; pageviews: number; visitors: number }[]>(
+  const rows = await fetchApi<{ date: string; pageviews: number; visitors: number; visits: number }[]>(
     `/stats/${siteId}/timeseries?period=${period}`
   )
   return rows.map((r) => ({
@@ -128,6 +128,8 @@ export async function getTimeseries(siteId: string, timeRange: TimeRange): Promi
       minute: '2-digit',
     }),
     visitors: r.visitors,
+    visits: r.visits,
+    pageviews: r.pageviews,
   }))
 }
 
@@ -162,6 +164,17 @@ export async function getCountries(siteId: string, timeRange: TimeRange): Promis
     country: r.country,
     visitors: Number(r.visitors),
     code: '',
+  }))
+}
+
+export async function getCities(siteId: string, timeRange: TimeRange): Promise<{ city: string; visitors: number }[]> {
+  const period = mapPeriod(timeRange)
+  const rows = await fetchApi<{ city: string; visitors: string }[]>(
+    `/stats/${siteId}/cities?period=${period}`
+  )
+  return rows.map((r) => ({
+    city: r.city,
+    visitors: Number(r.visitors),
   }))
 }
 
@@ -208,6 +221,39 @@ export async function getEvents(siteId: string, timeRange: TimeRange): Promise<G
     total: Number(r.count),
     uniques: Number(r.visitors),
     cr: 0,
+  }))
+}
+
+export async function getCampaigns(siteId: string, timeRange: TimeRange): Promise<SourceData[]> {
+  const period = mapPeriod(timeRange)
+  const rows = await fetchApi<{ source: string; medium: string; campaign: string; sessions: string }[]>(
+    `/stats/${siteId}/utm?period=${period}`
+  )
+  return rows.map((r) => ({
+    source: [r.source, r.medium, r.campaign].filter(Boolean).join(' / ') || 'Unknown',
+    visitors: Number(r.sessions),
+  }))
+}
+
+export async function getEntryPages(siteId: string, timeRange: TimeRange): Promise<PageData[]> {
+  const period = mapPeriod(timeRange)
+  const rows = await fetchApi<{ pathname: string; visitors: string }[]>(
+    `/stats/${siteId}/entry-pages?period=${period}`
+  )
+  return rows.map((r) => ({
+    pathname: r.pathname,
+    visitors: Number(r.visitors),
+  }))
+}
+
+export async function getExitPages(siteId: string, timeRange: TimeRange): Promise<PageData[]> {
+  const period = mapPeriod(timeRange)
+  const rows = await fetchApi<{ pathname: string; visitors: string }[]>(
+    `/stats/${siteId}/exit-pages?period=${period}`
+  )
+  return rows.map((r) => ({
+    pathname: r.pathname,
+    visitors: Number(r.visitors),
   }))
 }
 

@@ -130,7 +130,7 @@ export function SiteCard({ site, pinned, onDelete, onTogglePin }: SiteCardProps)
                     </linearGradient>
                   </defs>
                   <Area
-                    type="monotone"
+                    type="linear"
                     dataKey="visitors"
                     stroke={hasData ? '#3b82f6' : '#9ca3af'}
                     strokeWidth={hasData ? 2 : 1}

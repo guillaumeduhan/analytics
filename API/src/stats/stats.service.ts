@@ -94,6 +94,7 @@ export class StatsService {
       .select(`date_trunc('${trunc}', p.timestamp)`, 'date')
       .addSelect('COUNT(*)', 'pageviews')
       .addSelect('COUNT(DISTINCT p.visitor_id)', 'visitors')
+      .addSelect('COUNT(DISTINCT p.session_id)', 'visits')
       .where('p.site_id = :siteId', { siteId })
       .andWhere('p.timestamp BETWEEN :from AND :to', { from, to })
       .groupBy('date')
@@ -104,6 +105,7 @@ export class StatsService {
       date: r.date,
       pageviews: Number(r.pageviews),
       visitors: Number(r.visitors),
+      visits: Number(r.visits),
     }));
   }
 
@@ -143,6 +145,58 @@ export class StatsService {
       .getRawMany();
   }
 
+  /** Entry pages (first page of each session) */
+  async entryPages(siteId: string, period: string, limit = 10) {
+    await this.getSite(siteId);
+    const { from, to } = this.dateRange(period);
+
+    return this.pageviewRepo
+      .createQueryBuilder('p')
+      .select('p.pathname', 'pathname')
+      .addSelect('COUNT(DISTINCT p.session_id)', 'visitors')
+      .where('p.site_id = :siteId', { siteId })
+      .andWhere('p.timestamp BETWEEN :from AND :to', { from, to })
+      .andWhere((qb) => {
+        const sub = qb
+          .subQuery()
+          .select('MIN(p2.timestamp)')
+          .from('pageview', 'p2')
+          .where('p2.session_id = p.session_id')
+          .getQuery();
+        return `p.timestamp = ${sub}`;
+      })
+      .groupBy('p.pathname')
+      .orderBy('visitors', 'DESC')
+      .limit(limit)
+      .getRawMany();
+  }
+
+  /** Exit pages (last page of each session) */
+  async exitPages(siteId: string, period: string, limit = 10) {
+    await this.getSite(siteId);
+    const { from, to } = this.dateRange(period);
+
+    return this.pageviewRepo
+      .createQueryBuilder('p')
+      .select('p.pathname', 'pathname')
+      .addSelect('COUNT(DISTINCT p.session_id)', 'visitors')
+      .where('p.site_id = :siteId', { siteId })
+      .andWhere('p.timestamp BETWEEN :from AND :to', { from, to })
+      .andWhere((qb) => {
+        const sub = qb
+          .subQuery()
+          .select('MAX(p2.timestamp)')
+          .from('pageview', 'p2')
+          .where('p2.session_id = p.session_id')
+          .getQuery();
+        return `p.timestamp = ${sub}`;
+      })
+      .groupBy('p.pathname')
+      .orderBy('visitors', 'DESC')
+      .limit(limit)
+      .getRawMany();
+  }
+
   /** Breakdown by country */
   async countries(siteId: string, period: string, limit = 10) {
     await this.getSite(siteId);
@@ -157,6 +211,25 @@ export class StatsService {
       .andWhere('s.started_at BETWEEN :from AND :to', { from, to })
       .andWhere('s.country IS NOT NULL')
       .groupBy('s.country')
+      .orderBy('sessions', 'DESC')
+      .limit(limit)
+      .getRawMany();
+  }
+
+  /** Breakdown by city */
+  async cities(siteId: string, period: string, limit = 10) {
+    await this.getSite(siteId);
+    const { from, to } = this.dateRange(period);
+
+    return this.sessionRepo
+      .createQueryBuilder('s')
+      .select('s.city', 'city')
+      .addSelect('COUNT(*)', 'sessions')
+      .addSelect('COUNT(DISTINCT s.visitor_id)', 'visitors')
+      .where('s.site_id = :siteId', { siteId })
+      .andWhere('s.started_at BETWEEN :from AND :to', { from, to })
+      .andWhere('s.city IS NOT NULL')
+      .groupBy('s.city')
       .orderBy('sessions', 'DESC')
       .limit(limit)
       .getRawMany();

@@ -63,6 +63,8 @@ export interface SiteStats {
 export interface TimeSeriesData {
   timestamp: string
   visitors: number
+  visits: number
+  pageviews: number
 }
 
 export interface SourceData {

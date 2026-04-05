@@ -12,8 +12,9 @@ const nextConfig = {
       },
     ],
   },
-  // Force rebuild by changing timestamp
-  _buildId: Date.now(),
+  turbopack: {
+    root: '/Users/guillaume/Desktop/GUILLAUME/DEV/analytics-g/frontend',
+  },
 }
 
 export default nextConfig
