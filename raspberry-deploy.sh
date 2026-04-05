@@ -9,11 +9,13 @@ cd "$(dirname "$0")"
 echo "→ git pull"
 git pull
 
-echo "→ pm2 delete all"
+echo "→ pm2 delete all + kill daemon"
 pm2 delete all || true
+pm2 kill || true
 
 echo "→ free ports 4200 / 3000"
 sudo fuser -k 4200/tcp 3000/tcp 2>/dev/null || true
+sudo lsof -i :4200 -i :3000 || echo "  ports clean"
 
 echo "→ clean API"
 cd API
