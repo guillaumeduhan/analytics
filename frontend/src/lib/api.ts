@@ -48,14 +48,30 @@ export async function getSites(): Promise<SiteSummary[]> {
             `/stats/${site.id}/summary?period=today`
           ),
           fetchApi<{ date: string; pageviews: number; visitors: number }[]>(
-            `/stats/${site.id}/timeseries?period=7d`
+            `/stats/${site.id}/timeseries?period=today`
           ),
         ])
+
+        // Fill 24 rolling hourly buckets (same as /site page 24h chart)
+        const byHour = new Map<number, number>()
+        timeseries.forEach((d) => {
+          const h = new Date(d.date)
+          h.setMinutes(0, 0, 0)
+          byHour.set(h.getTime(), d.visitors)
+        })
+        const now = new Date()
+        now.setMinutes(0, 0, 0)
+        const sparklineData: number[] = []
+        for (let i = 23; i >= 0; i--) {
+          const t = now.getTime() - i * 3600_000
+          sparklineData.push(byHour.get(t) || 0)
+        }
+
         return {
           ...site,
           visitors24h: summary.visitors,
           trend: 0,
-          sparklineData: timeseries.map((d) => d.visitors),
+          sparklineData,
         } satisfies SiteSummary
       } catch {
         return {
