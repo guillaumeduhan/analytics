@@ -150,25 +150,19 @@ export class StatsService {
     await this.getSite(siteId);
     const { from, to } = this.dateRange(period);
 
-    return this.pageviewRepo
-      .createQueryBuilder('p')
-      .select('p.pathname', 'pathname')
-      .addSelect('COUNT(DISTINCT p.session_id)', 'visitors')
-      .where('p.site_id = :siteId', { siteId })
-      .andWhere('p.timestamp BETWEEN :from AND :to', { from, to })
-      .andWhere((qb) => {
-        const sub = qb
-          .subQuery()
-          .select('MIN(p2.timestamp)')
-          .from('pageviews', 'p2')
-          .where('p2.session_id = p.session_id')
-          .getQuery();
-        return `p.timestamp = ${sub}`;
-      })
-      .groupBy('p.pathname')
-      .orderBy('visitors', 'DESC')
-      .limit(limit)
-      .getRawMany();
+    return this.pageviewRepo.query(
+      `SELECT pathname, COUNT(*)::int AS visitors
+       FROM (
+         SELECT DISTINCT ON (session_id) session_id, pathname
+         FROM pageviews
+         WHERE site_id = $1 AND timestamp BETWEEN $2 AND $3
+         ORDER BY session_id, timestamp ASC
+       ) t
+       GROUP BY pathname
+       ORDER BY visitors DESC
+       LIMIT $4`,
+      [siteId, from, to, limit],
+    );
   }
 
   /** Exit pages (last page of each session) */
@@ -176,25 +170,19 @@ export class StatsService {
     await this.getSite(siteId);
     const { from, to } = this.dateRange(period);
 
-    return this.pageviewRepo
-      .createQueryBuilder('p')
-      .select('p.pathname', 'pathname')
-      .addSelect('COUNT(DISTINCT p.session_id)', 'visitors')
-      .where('p.site_id = :siteId', { siteId })
-      .andWhere('p.timestamp BETWEEN :from AND :to', { from, to })
-      .andWhere((qb) => {
-        const sub = qb
-          .subQuery()
-          .select('MAX(p2.timestamp)')
-          .from('pageviews', 'p2')
-          .where('p2.session_id = p.session_id')
-          .getQuery();
-        return `p.timestamp = ${sub}`;
-      })
-      .groupBy('p.pathname')
-      .orderBy('visitors', 'DESC')
-      .limit(limit)
-      .getRawMany();
+    return this.pageviewRepo.query(
+      `SELECT pathname, COUNT(*)::int AS visitors
+       FROM (
+         SELECT DISTINCT ON (session_id) session_id, pathname
+         FROM pageviews
+         WHERE site_id = $1 AND timestamp BETWEEN $2 AND $3
+         ORDER BY session_id, timestamp DESC
+       ) t
+       GROUP BY pathname
+       ORDER BY visitors DESC
+       LIMIT $4`,
+      [siteId, from, to, limit],
+    );
   }
 
   /** Breakdown by country */
