@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "analytics-api",
+      name: "analytics-api-4200",
       script: "dist/main.js",
       cwd: "/home/pi/analytics/API",
       instances: 1,
@@ -14,7 +14,7 @@ module.exports = {
       },
     },
     {
-      name: "analytics-front",
+      name: "analytics-front-3000",
       script: "node_modules/.bin/next",
       args: "start -p 3000",
       cwd: "/home/pi/analytics/frontend",
