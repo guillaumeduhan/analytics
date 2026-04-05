@@ -120,6 +120,32 @@ export async function getTimeseries(siteId: string, timeRange: TimeRange): Promi
   const rows = await fetchApi<{ date: string; pageviews: number; visitors: number; visits: number }[]>(
     `/stats/${siteId}/timeseries?period=${period}`
   )
+
+  // For 24h: fill 24 hourly buckets from (now - 24h) to now, rolling
+  if (timeRange === '24h') {
+    const byHour = new Map<number, { pageviews: number; visitors: number; visits: number }>()
+    rows.forEach((r) => {
+      const h = new Date(r.date)
+      h.setMinutes(0, 0, 0)
+      byHour.set(h.getTime(), { pageviews: r.pageviews, visitors: r.visitors, visits: r.visits })
+    })
+
+    const now = new Date()
+    now.setMinutes(0, 0, 0)
+    const buckets: TimeSeriesData[] = []
+    for (let i = 23; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 3600_000)
+      const m = byHour.get(d.getTime()) || { pageviews: 0, visitors: 0, visits: 0 }
+      buckets.push({
+        timestamp: d.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        visitors: m.visitors,
+        visits: m.visits,
+        pageviews: m.pageviews,
+      })
+    }
+    return buckets
+  }
+
   return rows.map((r) => ({
     timestamp: new Date(r.date).toLocaleString('en-US', {
       day: '2-digit',
