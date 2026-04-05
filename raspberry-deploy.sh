@@ -40,5 +40,8 @@ pm2 save
 echo "→ pm2 list"
 pm2 list
 
-echo "→ pm2 logs (Ctrl+C to exit)"
-pm2 logs --lines 30
+echo "→ pm2 logs (last 30 lines)"
+pm2 logs --lines 30 --nostream
+
+echo ""
+echo "✓ Deploy done. Tail live logs with: pm2 logs"
